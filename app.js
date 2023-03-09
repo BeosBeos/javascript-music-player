@@ -128,6 +128,15 @@ const app = {
         const _this = this;
         const cdWidth = cd.offsetWidth;
 
+        const cdThumbAnimate = cdThumb.animate(
+            [{ transform: 'rotate(360deg)' }],
+            {
+                duration: 10000,
+                iterations: Infinity,
+            }
+        );
+        cdThumbAnimate.pause();
+
         // // handle zooming CD
         // document.onscroll = function () {
         //     const scrollTop =
@@ -148,10 +157,12 @@ const app = {
             audio.onplay = function () {
                 _this.isPlaying = true;
                 player.classList.add('playing');
+                cdThumbAnimate.play();
             };
             audio.onpause = function () {
                 _this.isPlaying = false;
                 player.classList.remove('playing');
+                cdThumbAnimate.pause();
             };
         };
         // Change song tempo
