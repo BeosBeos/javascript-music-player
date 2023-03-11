@@ -28,11 +28,13 @@ const progress = $('#progress');
 const nextBtn = $('.btn-next');
 const prevBtn = $('.btn-prev');
 const randomBtn = $('.btn-random');
+const repeatBtn = $('.btn-repeat');
 
 const app = {
     currentIndex: 0,
     isPlaying: false,
     isRandom: false,
+    isRepeat: false,
 
     songs: [
         {
@@ -72,10 +74,10 @@ const app = {
             image: './assets/img/chandelier.png',
         },
         {
-            name: 'Cheap Thrills',
-            singer: 'Sia',
-            path: './assets/music/Cheap-Thrills-Sia-Sean-Paul.mp3',
-            image: './assets/img/cheap-thrills.webp',
+            name: 'Kết Thúc Mở',
+            singer: 'Vương Anh Tú',
+            path: './assets/music/Ket-thuc-mo-Vuong-anh-tu.mp3',
+            image: './assets/img/Ket-thuc-mo-Vuong-anh-tu.jpg',
         },
         {
             name: 'Falling-In-Love',
@@ -208,6 +210,21 @@ const app = {
         randomBtn.onclick = function () {
             _this.isRandom = !_this.isRandom;
             randomBtn.classList.toggle('active', _this.isRandom);
+        };
+
+        // Handle on/off repeat song
+        repeatBtn.onclick = function (e) {
+            _this.isRepeat = !_this.isRepeat;
+            repeatBtn.classList.toggle('active', _this.isRepeat);
+        };
+
+        // Handle next song and repeat song
+        audio.onended = function () {
+            if (_this.isRepeat) {
+                audio.play();
+            } else {
+                nextBtn.click();
+            }
         };
     },
 
