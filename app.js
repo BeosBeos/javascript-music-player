@@ -25,10 +25,14 @@ const cd = $('.cd');
 const playlist = $('.playlist');
 const playBtn = $('.btn-toggle-play');
 const progress = $('#progress');
+const nextBtn = $('.btn-next');
+const prevBtn = $('.btn-prev');
+const randomBtn = $('.btn-random');
 
 const app = {
     currentIndex: 0,
     isPlaying: false,
+    isRandom: false,
 
     songs: [
         {
@@ -50,13 +54,13 @@ const app = {
             image: './assets/img/falling-in-love.webp',
         },
         {
-            name: 'Qua-Phu-Tuong',
+            name: 'Quả Phụ Tướng',
             singer: 'Dunghoangpham',
             path: './assets/music/Qua-Phu-Tuong-Dunghoangpham.mp3',
             image: './assets/img/quaphutuong.webp',
         },
         {
-            name: 'Rang Khon',
+            name: 'Răng khôn',
             singer: 'Phi Phuong Anh',
             path: './assets/music/Rang-Khon-Phi-Phuong-Anh-RIN9.mp3',
             image: './assets/img/rangkhon.webp',
@@ -96,22 +100,22 @@ const app = {
     render: function () {
         const htmls = this.songs.map((song, index) => {
             return `
-            <div class="song ${
-                index === this.currentIndex ? 'active' : ''
-            }" data-index = "${index}">
-                <div class="thumb" style="background-image: url('${
-                    song.image
-                }')">
+                <div class="song ${
+                    index === this.currentIndex ? 'active' : ''
+                }" data-index = "${index}">
+                    <div class="thumb" style="background-image: url('${
+                        song.image
+                    }')">
+                    </div>
+                    <div class="body">
+                        <h3 class="title">${song.name}</h3>
+                        <p class="author">${song.singer}</p>
+                    </div>
+                    <div class="option">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
                 </div>
-                <div class="body">
-                    <h3 class="title">${song.name}</h3>
-                    <p class="author">${song.singer}</p>
-                </div>
-                <div class="option">
-                    <i class="fas fa-ellipsis-h"></i>
-                </div>
-            </div>
-            `;
+                `;
         });
         $('.playlist').innerHTML = htmls.join('');
     },
@@ -131,7 +135,7 @@ const app = {
         const cdThumbAnimate = cdThumb.animate(
             [{ transform: 'rotate(360deg)' }],
             {
-                duration: 10000,
+                duration: 10000, // 10 seconds
                 iterations: Infinity,
             }
         );
@@ -153,17 +157,17 @@ const app = {
             } else {
                 audio.play();
             }
+        };
 
-            audio.onplay = function () {
-                _this.isPlaying = true;
-                player.classList.add('playing');
-                cdThumbAnimate.play();
-            };
-            audio.onpause = function () {
-                _this.isPlaying = false;
-                player.classList.remove('playing');
-                cdThumbAnimate.pause();
-            };
+        audio.onplay = function () {
+            _this.isPlaying = true;
+            player.classList.add('playing');
+            cdThumbAnimate.play();
+        };
+        audio.onpause = function () {
+            _this.isPlaying = false;
+            player.classList.remove('playing');
+            cdThumbAnimate.pause();
         };
         // Change song tempo
         audio.ontimeupdate = function () {
@@ -173,18 +177,71 @@ const app = {
                 );
                 progress.value = progressPercent;
             }
+        };
 
-            progress.oninput = function (e) {
-                const seekTime = (audio.duration / 100) * e.target.value;
-                audio.currentTime = seekTime;
-            };
+        progress.onchange = function (e) {
+            const seekTime = (audio.duration / 100) * e.target.value;
+            audio.currentTime = seekTime;
+        };
+
+        // Next song
+        nextBtn.onclick = function () {
+            if (_this.isRandom) {
+                _this.playRandomSong();
+            } else {
+                _this.nextSong();
+            }
+            audio.play();
+        };
+
+        // Prev song
+        prevBtn.onclick = function () {
+            if (_this.isRandom) {
+                _this.playRandomSong();
+            } else {
+                _this.prevSong();
+            }
+            audio.play();
+        };
+
+        // Handle on/off random song
+        randomBtn.onclick = function () {
+            _this.isRandom = !_this.isRandom;
+            randomBtn.classList.toggle('active', _this.isRandom);
         };
     },
 
-    loadCurrenSong: function () {
+    loadCurrentSong: function () {
         heading.textContent = this.currentSong.name;
         cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
         audio.src = this.currentSong.path;
+    },
+
+    nextSong: function () {
+        this.currentIndex++;
+        if (this.currentIndex >= this.songs.length) {
+            this.currentIndex = 0;
+        }
+        this.loadCurrentSong();
+    },
+
+    prevSong: function () {
+        this.currentIndex--;
+        if (this.currentIndex < 0) {
+            this.currentIndex = this.songs.length - 1;
+        }
+        this.loadCurrentSong();
+    },
+
+    playRandomSong: function () {
+        let newIndex;
+        do {
+            newIndex = Math.floor(Math.random() * this.songs.length);
+        } while (newIndex === this.currentIndex);
+
+        this.currentIndex = newIndex;
+        console.log(newIndex);
+        this.loadCurrentSong();
     },
 
     start: function () {
@@ -192,7 +249,7 @@ const app = {
 
         this.handleEvent();
 
-        this.loadCurrenSong();
+        this.loadCurrentSong();
 
         this.render();
     },
