@@ -10,6 +10,7 @@
  * 8. Active song
  * 9. Scroll active song into view
  * 10. Play song when click
+ * 11. Volume
  **/
 
 const $ = document.querySelector.bind(document);
@@ -30,11 +31,23 @@ const randomBtn = $('.btn-random');
 const repeatBtn = $('.btn-repeat');
 const playlist = $('.playlist');
 
+const timeStart = $('.time-start');
+const timeEnd = $('.time-end');
+const Nmb1Start = $('.Nmb1Start');
+const Nmb2Start = $('.Nmb2Start');
+const Nmb1End = $('.Nmb1End');
+const Nmb2End = $('.Nmb2End');
+const volume = $('#volume');
+const volumeIcon = $('.volume-icon');
+const muteVolume = $('.mute-volume');
+
 const app = {
     currentIndex: 0,
     isPlaying: false,
     isRandom: false,
     isRepeat: false,
+    isMuted: false,
+
     config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
 
     songs: [
@@ -187,6 +200,20 @@ const app = {
             }
         };
 
+        // Running volume bar
+        volume.oninput = function (e) {
+            audio.volume = e.currentTarget.value / 100;
+            if (audio.volume == 0) {
+                audio.muted = true;
+                volumeIcon.classList.remove('fa-volume-high');
+                volumeIcon.classList.add('fa-volume-xmark');
+            } else {
+                audio.muted = false;
+                volumeIcon.classList.remove('fa-volume-xmark');
+                volumeIcon.classList.add('fa-volume-high');
+            }
+        };
+
         progress.onchange = function (e) {
             const seekTime = (audio.duration / 100) * e.target.value;
             audio.currentTime = seekTime;
@@ -254,6 +281,21 @@ const app = {
                 // Handle click option
                 if (e.target.closest('.option')) {
                 }
+            }
+        };
+
+        // Handle click on volume
+        volumeIcon.onclick = function () {
+            if (audio.muted == false) {
+                audio.muted = true;
+                volumeIcon.classList.remove('fa-volume-high');
+                volumeIcon.classList.add('fa-volume-xmark');
+                volume.value = 0;
+            } else {
+                audio.muted = false;
+                volumeIcon.classList.remove('fa-volume-xmark');
+                volumeIcon.classList.add('fa-volume-high');
+                volume.value = Math.floor(audio.volume * 100);
             }
         };
     },
