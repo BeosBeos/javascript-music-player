@@ -22,13 +22,13 @@ const heading = $('header h2');
 const cdThumb = $('.cd-thumb');
 const audio = $('#audio');
 const cd = $('.cd');
-const playlist = $('.playlist');
 const playBtn = $('.btn-toggle-play');
 const progress = $('#progress');
 const nextBtn = $('.btn-next');
 const prevBtn = $('.btn-prev');
 const randomBtn = $('.btn-random');
 const repeatBtn = $('.btn-repeat');
+const playlist = $('.playlist');
 
 const app = {
     currentIndex: 0,
@@ -119,7 +119,7 @@ const app = {
                 </div>
                 `;
         });
-        $('.playlist').innerHTML = htmls.join('');
+        playlist.innerHTML = htmls.join('');
     },
 
     defineProperties: function () {
@@ -194,6 +194,8 @@ const app = {
                 _this.nextSong();
             }
             audio.play();
+            _this.render();
+            _this.scrollToActiveSong();
         };
 
         // Prev song
@@ -204,6 +206,8 @@ const app = {
                 _this.prevSong();
             }
             audio.play();
+            _this.render();
+            _this.scrollToActiveSong();
         };
 
         // Handle on/off random song
@@ -226,6 +230,33 @@ const app = {
                 nextBtn.click();
             }
         };
+
+        // Listen to playlist click behavior
+        playlist.onclick = function (e) {
+            const songNode = e.target.closest('.song:not(.active)');
+            if (songNode || e.target.closest('.option')) {
+                // Handle click song
+                if (songNode) {
+                    _this.currentIndex = Number(songNode.dataset.index);
+                    _this.loadCurrentSong();
+                    _this.render();
+                    audio.play();
+                }
+
+                // Handle click option
+                if (e.target.closest('.option')) {
+                }
+            }
+        };
+    },
+
+    scrollToActiveSong: function () {
+        setTimeout(() => {
+            $('.active.song').scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+            });
+        }, 300);
     },
 
     loadCurrentSong: function () {
