@@ -198,6 +198,13 @@ const app = {
                 );
                 progress.value = progressPercent;
             }
+
+            Nmb1Start.innerText = Math.floor(audio.currentTime / 60)
+                .toLocaleString()
+                .padStart(2, '0');
+            Nmb2Start.innerText = Math.floor(audio.currentTime % 60)
+                .toLocaleString()
+                .padStart(2, '0');
         };
 
         // Running volume bar
@@ -212,6 +219,23 @@ const app = {
                 volumeIcon.classList.remove('fa-volume-xmark');
                 volumeIcon.classList.add('fa-volume-high');
             }
+        };
+
+        // Handle show time song
+        audio.onloadedmetadata = function () {
+            Nmb1End.innerText = Math.floor(audio.duration / 60)
+                .toLocaleString()
+                .padStart(2, '0');
+            Nmb2End.innerText = Math.round(audio.duration % 60)
+                .toLocaleString()
+                .padStart(2, '0');
+
+            Nmb1Start.innerText = Math.floor(audio.currentTime / 60)
+                .toLocaleString()
+                .padStart(2, '0');
+            Nmb2Start.innerText = Math.floor(audio.currentTime % 60)
+                .toLocaleString()
+                .padStart(2, '0');
         };
 
         progress.onchange = function (e) {
