@@ -35,6 +35,7 @@ const app = {
     isPlaying: false,
     isRandom: false,
     isRepeat: false,
+    config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
 
     songs: [
         {
@@ -98,6 +99,11 @@ const app = {
             image: './assets/img/rangkhon.webp',
         },
     ],
+
+    setConfig: function (key, value) {
+        this.config[key] = value;
+        localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config));
+    },
 
     render: function () {
         const htmls = this.songs.map((song, index) => {
@@ -213,12 +219,14 @@ const app = {
         // Handle on/off random song
         randomBtn.onclick = function () {
             _this.isRandom = !_this.isRandom;
+            _this.setConfig('isRandom', _this.isRandom);
             randomBtn.classList.toggle('active', _this.isRandom);
         };
 
         // Handle on/off repeat song
         repeatBtn.onclick = function (e) {
             _this.isRepeat = !_this.isRepeat;
+            _this.setConfig('isRepeat', _this.isRepeat);
             repeatBtn.classList.toggle('active', _this.isRepeat);
         };
 
@@ -265,6 +273,11 @@ const app = {
         audio.src = this.currentSong.path;
     },
 
+    loadConfig: function () {
+        this.isRandom = this.config.isRandom;
+        this.isRepeat = this.config.isRepeat;
+    },
+
     nextSong: function () {
         this.currentIndex++;
         if (this.currentIndex >= this.songs.length) {
@@ -288,18 +301,28 @@ const app = {
         } while (newIndex === this.currentIndex);
 
         this.currentIndex = newIndex;
-        console.log(newIndex);
         this.loadCurrentSong();
     },
 
     start: function () {
+        // Assign configuration from config to object
+        this.loadConfig();
+
+        // Property definition for object
         this.defineProperties();
 
+        // Listen/handle events
         this.handleEvent();
 
+        // Load the first song info into the UI when running the app
         this.loadCurrentSong();
 
+        // Render playlist
         this.render();
+
+        // Show initial status of button repeat and random
+        randomBtn.classList.toggle('active', this.isRandom);
+        repeatBtn.classList.toggle('active', this.isRepeat);
     },
 };
 
